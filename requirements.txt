@@ -1,0 +1,28 @@
+# --- Web app ---
+streamlit>=1.41
+
+# --- Data handling ---
+pandas>=2.2
+numpy>=1.26
+openpyxl>=3.1
+
+# --- Visualisation ---
+plotly>=5.24
+
+# --- Machine learning ---
+scikit-learn>=1.5
+
+# --- Google Gemini (Milestone 5: the AI Assistant) ---
+# 2.31+ ships the Interactions API (client.interactions.create) and
+# structured outputs used by core/gemini.py.
+google-genai>=2.31
+
+# --- Configuration (.env loading for the API key) ---
+python-dotenv>=1.0
+
+# --- Data validation and storage ---
+pydantic>=2.7
+sqlalchemy>=2.0
+
+# --- Testing ---
+pytest>=8.0

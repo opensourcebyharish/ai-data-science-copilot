@@ -1,0 +1,72 @@
+# ---------------------------------------------------------------------------
+# AI Data Science Copilot — local files that must never enter the repository
+# ---------------------------------------------------------------------------
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables — API keys live here, never in source code
+.env
+.env.*
+!.env.example
+
+# Local agent/editor settings that can contain credentials
+.claude/
+.cursor/
+.codeium/
+
+# Streamlit secrets file — local credentials only
+# (.streamlit/config.toml holds the theme and IS tracked)
+.streamlit/secrets.toml
+
+# Local run-history database (Models page, Milestone 6)
+ml_runs.db
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Uploaded datasets and generated exports (the shipped sample is kept)
+data/
+datasets/
+uploads/
+exports/
+reports/
+*.xlsx
+*.xls
+
+# Python cache and packaging artefacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Test and coverage caches
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editor and operating-system artefacts
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.log

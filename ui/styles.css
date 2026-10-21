@@ -1,0 +1,991 @@
+/* ==========================================================================
+   AI Data Science Copilot — design system
+   A premium dark analytics workspace: deep navy surfaces, cyan primary
+   accent, violet secondary accent. Loaded once per run by ui/theme.py.
+
+   Layers, in order:
+     1. Tokens        — colors, spacing, type, radii, shadows, motion
+     2. Base          — app background, typography, scrollbars
+     3. Chrome        — sidebar, header, navigation states
+     4. Components    — buttons, inputs, tabs, expanders, tables, alerts…
+     5. Page pieces   — headers, chips, cards, empty states, roadmap
+     6. States        — loading/skeleton, hover motion
+     7. Accessibility — focus rings, reduced motion, narrow screens
+
+   Only stable Streamlit test ids and our own class names are targeted, so
+   native widget behaviour is never changed — only its appearance.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. Tokens
+   ========================================================================== */
+
+:root {
+  /* --- Surfaces (deep navy scale) --- */
+  --c-bg: #0b1220;
+  --c-bg-elevated: #0e1729;
+  --c-surface: #111c33;
+  --c-surface-2: #16233f;
+  --c-surface-3: #1b2b4d;
+  --c-border: #223252;
+  --c-border-strong: #2f4370;
+
+  /* --- Text --- */
+  --c-text: #e2e8f0;
+  --c-muted: #93a4bd;
+  --c-faint: #6b7c99;
+
+  /* --- Accents --- */
+  --c-cyan: #22d3ee;
+  --c-cyan-strong: #67e8f9;
+  --c-cyan-soft: rgba(34, 211, 238, 0.14);
+  --c-cyan-line: rgba(34, 211, 238, 0.35);
+  --c-violet: #a78bfa;
+  --c-violet-soft: rgba(167, 139, 250, 0.14);
+  --c-violet-line: rgba(167, 139, 250, 0.35);
+
+  /* --- Semantic colors --- */
+  --c-good: #34d399;
+  --c-warn: #fbbf24;
+  --c-bad: #f87171;
+  --c-neutral: #94a3b8;
+
+  /* --- Gradients (kept subtle: no heavy glow) --- */
+  --g-brand: linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%);
+  --g-surface: linear-gradient(180deg, rgba(22, 35, 63, 0.85) 0%, rgba(17, 28, 51, 0.85) 100%);
+  --g-hairline: linear-gradient(90deg, var(--c-cyan) 0%, rgba(167, 139, 250, 0.65) 55%, transparent 100%);
+  /* Two very faint corner glows behind the whole app — 4–6% alpha. */
+  --g-ambient:
+    radial-gradient(1100px 520px at 12% -8%, rgba(34, 211, 238, 0.055), transparent 62%),
+    radial-gradient(900px 480px at 92% -12%, rgba(167, 139, 250, 0.055), transparent 60%);
+
+  /* --- Typography --- */
+  --font-sans: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
+  --font-xs: 0.75rem;
+  --font-sm: 0.82rem;
+  --font-md: 0.95rem;
+  --font-lg: 1.05rem;
+  --font-title: 1.5rem;
+  --font-hero: 1.85rem;
+  --lh-tight: 1.25;
+  --lh-body: 1.6;
+  --weight-normal: 450;
+  --weight-strong: 600;
+  --weight-bold: 700;
+  --tracking-wide: 0.06em;
+  --tracking-wider: 0.1em;
+
+  /* --- Spacing scale --- */
+  --gap-1: 0.25rem;
+  --gap-2: 0.5rem;
+  --gap-3: 1rem;
+  --gap-4: 1.75rem;
+  --gap-5: 2.5rem;
+
+  /* --- Borders, radii, shadows --- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
+  --border: 1px solid var(--c-border);
+  --shadow-1: 0 1px 2px rgba(2, 6, 23, 0.45);
+  --shadow-2: 0 6px 18px rgba(2, 6, 23, 0.45);
+  --shadow-3: 0 18px 42px rgba(2, 6, 23, 0.55);
+  --ring: 0 0 0 3px rgba(34, 211, 238, 0.22);
+
+  /* --- Motion (restrained by design) --- */
+  --ease: 160ms ease;
+  --ease-out: 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ==========================================================================
+   2. Base
+   ========================================================================== */
+
+html,
+body,
+[data-testid="stAppViewContainer"] {
+  background-color: var(--c-bg);
+  background-image: var(--g-ambient);
+  background-attachment: fixed;
+  color: var(--c-text);
+  font-family: var(--font-sans);
+}
+
+[data-testid="stAppViewContainer"] .main {
+  background: transparent;
+}
+
+[data-testid="stMainBlockContainer"],
+.block-container {
+  padding-top: 2.25rem;
+  padding-bottom: 4rem;
+  max-width: 1280px;
+}
+
+[data-testid="stMarkdownContainer"] {
+  line-height: var(--lh-body);
+}
+
+[data-testid="stMarkdownContainer"] p {
+  margin-bottom: 0.35rem;
+}
+
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3 {
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+}
+
+/* Links inside content keep the brand accent. */
+[data-testid="stMarkdownContainer"] a {
+  color: var(--c-cyan-strong);
+  text-underline-offset: 2px;
+}
+
+code,
+kbd,
+pre,
+[data-testid="stCode"] {
+  font-family: var(--font-mono);
+}
+
+/* Thin, unobtrusive scrollbars. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--c-border-strong);
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #3d558b;
+  background-clip: content-box;
+}
+
+/* ==========================================================================
+   3. App chrome — sidebar, header, navigation
+   ========================================================================== */
+
+[data-testid="stSidebar"] {
+  background: var(--c-bg-elevated);
+  border-right: var(--border);
+}
+
+[data-testid="stSidebarContent"] {
+  padding-top: 1.1rem;
+}
+
+/* Collapse/expand control and header strip. */
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="stSidebarCollapsedControl"] button {
+  color: var(--c-muted);
+  border-radius: var(--radius-sm);
+}
+
+[data-testid="stHeader"] {
+  background: rgba(11, 18, 32, 0.72);
+  backdrop-filter: blur(8px);
+  border-bottom: var(--border);
+}
+
+[data-testid="stToolbar"] {
+  right: 0.6rem;
+}
+
+/* --- Sidebar navigation: hover + active states --- */
+
+[data-testid="stSidebarNav"] {
+  padding-top: 0.25rem;
+}
+
+[data-testid="stSidebarNav"] ul {
+  gap: 0.15rem;
+}
+
+[data-testid="stSidebarNav"] a {
+  border-radius: var(--radius-md);
+  border-left: 2px solid transparent;
+  padding-left: 0.65rem;
+  color: var(--c-muted);
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+}
+
+[data-testid="stSidebarNav"] a:hover {
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+[data-testid="stSidebarNav"] a[aria-current="page"],
+[data-testid="stSidebarNav"] a[aria-selected="true"] {
+  background: var(--c-cyan-soft);
+  border-left-color: var(--c-cyan);
+  color: var(--c-text);
+  font-weight: var(--weight-strong);
+}
+
+[data-testid="stSidebarNav"] a[aria-current="page"] [data-testid="stIconMaterial"] {
+  color: var(--c-cyan);
+}
+
+[data-testid="stSidebarNavSeparator"] {
+  border-color: var(--c-border);
+}
+
+[data-testid="stSidebarNav"] span,
+[data-testid="stSidebarNav"] p {
+  font-size: var(--font-md);
+}
+
+/* Section labels inside the sidebar ("Workspace", "Intelligence"). */
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+  color: var(--c-muted);
+}
+
+[data-testid="stSidebar"] hr {
+  border-color: var(--c-border);
+  margin: var(--gap-3) 0;
+}
+
+/* ==========================================================================
+   4. Components — widgets
+   ========================================================================== */
+
+/* --- Buttons --- */
+
+.stButton > button,
+.stDownloadButton > button,
+.stFormSubmitButton > button,
+.stLinkButton > a {
+  border-radius: var(--radius-md);
+  border: var(--border);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-weight: var(--weight-strong);
+  transition: background var(--ease), border-color var(--ease), color var(--ease),
+    box-shadow var(--ease), transform var(--ease);
+}
+
+.stButton > button:hover,
+.stDownloadButton > button:hover,
+.stFormSubmitButton > button:hover,
+.stLinkButton > a:hover {
+  border-color: var(--c-cyan-line);
+  color: var(--c-text);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+}
+
+.stButton > button:active,
+.stDownloadButton > button:active,
+.stFormSubmitButton > button:active,
+.stLinkButton > a:active {
+  transform: translateY(0);
+}
+
+/* Primary action: cyan→violet brand gradient, dark text for contrast. */
+.stButton > button[kind="primary"],
+.stDownloadButton > button[kind="primary"],
+.stFormSubmitButton > button[kind="primaryFormSubmit"],
+.stLinkButton > a[kind="primary"] {
+  background: var(--g-brand);
+  background-color: var(--c-cyan);
+  border: 1px solid rgba(34, 211, 238, 0.55);
+  color: #04121c;
+  font-weight: var(--weight-bold);
+  box-shadow: var(--shadow-1);
+}
+
+.stButton > button[kind="primary"]:hover,
+.stDownloadButton > button[kind="primary"]:hover,
+.stFormSubmitButton > button[kind="primaryFormSubmit"]:hover,
+.stLinkButton > a[kind="primary"]:hover {
+  box-shadow: var(--shadow-3);
+  transform: translateY(-1px);
+}
+
+.stButton > button:disabled,
+.stDownloadButton > button:disabled,
+.stFormSubmitButton > button:disabled {
+  background: var(--c-surface);
+  color: var(--c-faint);
+  border-color: var(--c-border);
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* --- Inputs --- */
+
+.stTextInput input,
+.stNumberInput input,
+.stTextArea textarea,
+.stDateInput input,
+.stTimeInput input {
+  background: var(--c-bg-elevated);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  color: var(--c-text);
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+  color: var(--c-faint);
+}
+
+.stTextInput input:focus,
+.stNumberInput input:focus,
+.stTextArea textarea:focus,
+.stDateInput input:focus {
+  border-color: var(--c-cyan-line);
+  box-shadow: var(--ring);
+}
+
+/* Select / multiselect share the same surface treatment. */
+[data-baseweb="select"] > div,
+[data-baseweb="input"] > div {
+  background: var(--c-bg-elevated);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+
+[data-baseweb="select"] > div:hover {
+  border-color: var(--c-border-strong);
+}
+
+[data-baseweb="select"] > div:focus-within {
+  border-color: var(--c-cyan-line);
+  box-shadow: var(--ring);
+}
+
+[data-baseweb="popover"] [role="listbox"] {
+  background: var(--c-surface);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-3);
+}
+
+/* Selected tags in a multiselect. */
+[data-baseweb="tag"] {
+  background: var(--c-cyan-soft) !important;
+  border: 1px solid var(--c-cyan-line) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--c-text) !important;
+}
+
+/* --- Slider / segmented control --- */
+
+[data-testid="stSlider"] [role="slider"] {
+  box-shadow: 0 0 0 2px var(--c-bg), 0 0 0 4px var(--c-cyan-soft);
+}
+
+[data-testid="stSliderTickBarMin"],
+[data-testid="stSliderTickBarMax"] {
+  color: var(--c-faint);
+}
+
+[data-testid="stSegmentedControl"] button,
+[data-testid="stSegmentedControl"] label {
+  border-radius: var(--radius-sm);
+  transition: background var(--ease), color var(--ease);
+}
+
+/* --- Tabs --- */
+
+[data-testid="stTabs"] [data-baseweb="tab-list"] {
+  gap: var(--gap-1);
+  border-bottom: var(--border);
+}
+
+[data-testid="stTabs"] [data-baseweb="tab"] {
+  color: var(--c-muted);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: color var(--ease), background var(--ease);
+}
+
+[data-testid="stTabs"] [data-baseweb="tab"]:hover {
+  color: var(--c-text);
+  background: var(--c-surface);
+}
+
+[data-testid="stTabs"] [aria-selected="true"] {
+  color: var(--c-text);
+  font-weight: var(--weight-strong);
+}
+
+[data-testid="stTabs"] [data-baseweb="tab-highlight"] {
+  background: var(--c-cyan);
+  height: 2px;
+}
+
+/* --- Expanders --- */
+
+[data-testid="stExpander"] {
+  background: var(--c-surface);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  transition: border-color var(--ease);
+}
+
+[data-testid="stExpander"]:hover {
+  border-color: var(--c-border-strong);
+}
+
+[data-testid="stExpander"] summary {
+  font-weight: var(--weight-strong);
+  transition: background var(--ease);
+}
+
+[data-testid="stExpander"] summary:hover {
+  background: var(--c-surface-2);
+}
+
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+  color: var(--c-muted);
+}
+
+/* --- Bordered containers (st.container(border=True) section cards) --- */
+
+[data-testid="stVerticalBlockBorderWrapper"] {
+  border: var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--g-surface);
+  box-shadow: var(--shadow-1);
+}
+
+/* Only pad nested cards, not the top-level page wrapper. */
+[data-testid="stVerticalBlockBorderWrapper"] > div > [data-testid="stVerticalBlock"] {
+  gap: var(--gap-3);
+}
+
+/* --- Tables / dataframes --- */
+
+[data-testid="stDataFrame"],
+[data-testid="stTable"],
+[data-testid="stDataFrameResizable"] {
+  border: var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--c-surface);
+}
+
+[data-testid="stDataFrame"] [role="columnheader"] {
+  background: var(--c-surface-2);
+  color: var(--c-muted);
+  font-weight: var(--weight-strong);
+}
+
+/* --- Alerts: keep Streamlit's icon, add a left accent rule --- */
+
+[data-testid="stAlert"] {
+  border-radius: var(--radius-md);
+  border: var(--border);
+  border-left-width: 3px;
+  color: var(--c-text);
+}
+
+[data-testid="stAlert"] p {
+  color: var(--c-text);
+}
+
+[data-testid="stAlert"]:has([data-testid="stAlertContentInfo"]) {
+  border-left-color: var(--c-cyan);
+  background: var(--c-cyan-soft);
+}
+
+[data-testid="stAlert"]:has([data-testid="stAlertContentSuccess"]) {
+  border-left-color: var(--c-good);
+  background: rgba(52, 211, 153, 0.1);
+}
+
+[data-testid="stAlert"]:has([data-testid="stAlertContentWarning"]) {
+  border-left-color: var(--c-warn);
+  background: rgba(251, 191, 36, 0.1);
+}
+
+[data-testid="stAlert"]:has([data-testid="stAlertContentError"]) {
+  border-left-color: var(--c-bad);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* --- Chat (AI Assistant) --- */
+
+[data-testid="stChatMessage"] {
+  background: var(--c-surface);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-3);
+  box-shadow: var(--shadow-1);
+  margin-bottom: var(--gap-2);
+}
+
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+  background: var(--c-surface-2);
+  border-color: var(--c-border-strong);
+}
+
+[data-testid="stChatMessageAvatarUser"],
+[data-testid="stChatMessageAvatarAssistant"] {
+  border: 1px solid var(--c-border-strong);
+}
+
+[data-testid="stChatInput"] {
+  border-radius: var(--radius-lg);
+  border: var(--border);
+  background: var(--c-surface);
+}
+
+[data-testid="stChatInput"]:focus-within {
+  border-color: var(--c-cyan-line);
+  box-shadow: var(--ring);
+}
+
+/* --- Badges, code, progress, tooltips, dividers --- */
+
+[data-testid="stBadge"] {
+  border-radius: var(--radius-pill);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.02em;
+}
+
+[data-testid="stCode"] {
+  background: #0a1120;
+  border: var(--border);
+  border-radius: var(--radius-md);
+}
+
+[data-testid="stCode"] pre {
+  background: transparent;
+}
+
+code:not([data-testid="stCode"] code) {
+  background: var(--c-cyan-soft);
+  border-radius: var(--radius-xs);
+  padding: 0.05rem 0.3rem;
+  color: var(--c-cyan-strong);
+}
+
+[data-testid="stProgress"] > div > div > div {
+  background: var(--g-brand);
+}
+
+[data-testid="stTooltipContent"] {
+  background: var(--c-surface-3);
+  color: var(--c-text);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-3);
+}
+
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p {
+  color: var(--c-muted);
+  font-size: var(--font-sm);
+}
+
+hr,
+[data-testid="stDivider"] {
+  border-color: var(--c-border);
+}
+
+/* ==========================================================================
+   5. Page pieces
+   ========================================================================== */
+
+/* --- Page header --- */
+
+.page-header {
+  margin: 0 0 var(--gap-4) 0;
+}
+
+.page-header__row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: var(--font-hero);
+  font-weight: var(--weight-bold);
+  color: var(--c-text);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  color: var(--c-muted);
+  font-size: var(--font-md);
+  margin: var(--gap-2) 0 0 0;
+  max-width: 92ch;
+}
+
+/* Thin brand hairline under every page header. */
+.page-header__rule {
+  height: 2px;
+  width: 100%;
+  margin-top: var(--gap-3);
+  background: var(--g-hairline);
+  border-radius: var(--radius-pill);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  font-size: var(--font-lg);
+  font-weight: var(--weight-strong);
+  color: var(--c-text);
+  letter-spacing: 0.01em;
+  margin: var(--gap-4) 0 var(--gap-2) 0;
+}
+
+.section-title::before {
+  content: "";
+  width: 3px;
+  height: 1em;
+  border-radius: var(--radius-pill);
+  background: var(--g-brand);
+  flex: none;
+}
+
+/* --- Status chips --- */
+
+.chip {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-wide);
+  border: 1px solid transparent;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.chip--live {
+  color: var(--c-cyan);
+  background: var(--c-cyan-soft);
+  border-color: var(--c-cyan-line);
+}
+
+.chip--soon {
+  color: var(--c-violet);
+  background: var(--c-violet-soft);
+  border-color: var(--c-violet-line);
+}
+
+.chip--done {
+  color: var(--c-good);
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.chip--progress {
+  color: var(--c-warn);
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.chip--todo {
+  color: var(--c-neutral);
+  background: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.25);
+}
+
+/* --- Sidebar brand --- */
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  padding: var(--gap-1) 0 var(--gap-1) 0;
+}
+
+.sidebar-brand__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  flex: none;
+  border-radius: var(--radius-md);
+  background: var(--g-brand);
+  color: #04121c;
+  font-size: 1rem;
+  box-shadow: var(--shadow-1);
+}
+
+.sidebar-brand__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar-brand__name {
+  font-size: 1rem;
+  font-weight: var(--weight-bold);
+  color: var(--c-text);
+  letter-spacing: 0.01em;
+  line-height: var(--lh-tight);
+}
+
+.sidebar-brand__tagline {
+  font-size: var(--font-sm);
+  color: var(--c-muted);
+  letter-spacing: 0.01em;
+}
+
+/* --- Cards & quick actions --- */
+
+.card-title {
+  font-size: var(--font-md);
+  font-weight: var(--weight-strong);
+  color: var(--c-text);
+  margin: 0 0 var(--gap-1) 0;
+  letter-spacing: 0.01em;
+}
+
+.status-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--gap-2);
+  color: var(--c-muted);
+  font-size: var(--font-sm);
+  margin: 0;
+}
+
+.status-line--ok {
+  color: var(--c-text);
+}
+
+/* Compact key/value strip used for dataset status. */
+.kv {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--gap-3);
+}
+
+.kv__item {
+  border-left: 1px solid var(--c-border);
+  padding-left: var(--gap-3);
+}
+
+.kv__label {
+  color: var(--c-faint);
+  font-size: var(--font-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
+.kv__value {
+  color: var(--c-text);
+  font-size: var(--font-lg);
+  font-weight: var(--weight-strong);
+  line-height: var(--lh-tight);
+}
+
+/* --- Planned-page banner --- */
+
+.planned-banner {
+  border: 1px solid var(--c-violet-line);
+  border-left: 3px solid var(--c-violet);
+  background: var(--c-violet-soft);
+  border-radius: var(--radius-md);
+  padding: var(--gap-3);
+  color: var(--c-text);
+  margin: 0 0 var(--gap-3) 0;
+}
+
+.planned-banner strong {
+  color: var(--c-violet);
+}
+
+/* --- KPI cards (native st.metric, restyled) --- */
+
+[data-testid="stMetric"] {
+  background: var(--g-surface);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-3);
+  box-shadow: var(--shadow-1);
+  transition: border-color var(--ease), box-shadow var(--ease), transform var(--ease);
+}
+
+[data-testid="stMetric"]:hover {
+  border-color: var(--c-cyan-line);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+}
+
+[data-testid="stMetricLabel"] {
+  color: var(--c-muted);
+  font-size: var(--font-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+[data-testid="stMetricValue"] {
+  color: var(--c-text);
+  font-weight: var(--weight-bold);
+}
+
+[data-testid="stMetricDelta"] {
+  font-size: var(--font-sm);
+}
+
+/* --- Empty state --- */
+
+.empty-state {
+  border: 1px dashed var(--c-border-strong);
+  border-radius: var(--radius-xl);
+  background: var(--g-surface);
+  padding: var(--gap-5) var(--gap-4);
+  text-align: center;
+  margin: var(--gap-3) 0;
+}
+
+.empty-state__icon {
+  font-size: 1.75rem;
+  margin-bottom: var(--gap-2);
+  opacity: 0.9;
+}
+
+.empty-state__title {
+  font-size: var(--font-lg);
+  font-weight: var(--weight-strong);
+  color: var(--c-text);
+  margin: 0 0 var(--gap-1) 0;
+}
+
+.empty-state__message {
+  color: var(--c-muted);
+  margin: 0 auto;
+  max-width: 46ch;
+}
+
+.empty-state__hint {
+  color: var(--c-muted);
+  font-size: var(--font-sm);
+  margin: var(--gap-2) auto 0 auto;
+  padding-top: var(--gap-2);
+  border-top: 1px solid var(--c-border);
+  display: inline-block;
+}
+
+/* --- Charts (Plotly surface) --- */
+
+[data-testid="stPlotlyChart"],
+.js-plotly-plot {
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  padding: var(--gap-2);
+  box-shadow: var(--shadow-1);
+}
+
+/* --- Roadmap rows (Overview) --- */
+
+.roadmap-row {
+  padding: var(--gap-2) 0;
+  border-bottom: 1px solid var(--c-border);
+}
+
+/* ==========================================================================
+   6. Loading states
+   ========================================================================== */
+
+[data-testid="stSpinner"] > div {
+  border-top-color: var(--c-cyan);
+}
+
+[data-testid="stStatusWidget"] {
+  border-radius: var(--radius-md);
+}
+
+/* Skeleton shimmer Streamlit shows while a dataframe/chart loads. */
+[data-testid="stSkeleton"] {
+  background: linear-gradient(
+    90deg,
+    var(--c-surface) 25%,
+    var(--c-surface-2) 37%,
+    var(--c-surface) 63%
+  );
+  background-size: 400% 100%;
+  border-radius: var(--radius-sm);
+  animation: dsc-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes dsc-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* ==========================================================================
+   7. Accessibility & responsive
+   ========================================================================== */
+
+:where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--c-cyan);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
+  .stButton > button:hover,
+  .stDownloadButton > button:hover,
+  .stFormSubmitButton > button:hover,
+  .stLinkButton > a:hover,
+  [data-testid="stMetric"]:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 900px) {
+  [data-testid="stMainBlockContainer"],
+  .block-container {
+    padding-top: 1.5rem;
+  }
+
+  .page-title {
+    font-size: var(--font-title);
+  }
+
+  .kv__item:first-child {
+    border-left: none;
+    padding-left: 0;
+  }
+}
